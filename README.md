@@ -1,4 +1,3 @@
-# Spark-Streaming-With-Docker
 # Spark Streaming With Docker
 
 This repository showcases a comprehensive data processing pipeline built with PySpark Structured Streaming, leveraging Apache Kafka for real-time messaging and MinIO as an S3-compatible storage solution. The project simulates a car telemetry system where sensor data is generated, enriched with metadata, analyzed for anomalies, and aggregated for monitoring. Designed to run within a Dockerized environment, it demonstrates key concepts of stream processing, data enrichment, alerting, and aggregation.
