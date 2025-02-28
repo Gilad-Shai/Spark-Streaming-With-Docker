@@ -1,0 +1,82 @@
+version: '3.2'
+services:
+  minio:
+    container_name: minio
+    image: minio/minio:latest  # Use the latest MinIO image
+    command: server /data --console-address ":9001"
+    ports:
+      - "9001:9000"  # MinIO API
+      - "9002:9001"  # MinIO Console
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    volumes:
+      - minio-data:/data
+    networks:
+      - default
+
+  zookeeper:
+    container_name: zookeeper
+    image: wurstmeister/zookeeper:latest  # Use the latest Zookeeper image
+    ports:
+      - "2181:2181"
+    networks:
+      - default
+
+  kafka:
+    container_name: kafka
+    image: wurstmeister/kafka:latest  # Use the latest Kafka image
+    environment:
+      - KAFKA_ADVERTISED_HOST_NAME=kafka
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CREATE_TOPICS=sensors-sample:1:1,samples-enriched:1:1,alert-data:1:1
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    networks:
+      - default
+
+  kafdrop:
+    container_name: kafdrop
+    image: obsidiandynamics/kafdrop:latest  # Use the latest Kafdrop image
+    ports:
+      - "9003:9000"
+    environment:
+      - KAFKA_BROKERCONNECT=kafka:9092
+    depends_on:
+      - kafka
+    networks:
+      - default
+
+  python:
+    container_name: python
+    image: python:latest  # Use the latest Python image
+    command: bash -c "pip install kafka-python && tail -f /dev/null"  # Install kafka-python and keep alive
+    volumes:
+      - ./:/app  # Mount local dir for scripts
+    networks:
+      - default
+
+  spark:
+    container_name: spark
+    image: bitnami/spark:latest  # Use the latest Apache Spark image from Bitnami
+    environment:
+      - SPARK_MODE=master
+      - SPARK_MASTER_HOST=spark
+      - SPARK_MASTER_PORT=7077
+    ports:
+      - "7077:7077"  # Spark Master
+      - "8080:8080"  # Spark Master UI
+      - "4040:4040"  # Spark Application UI
+    volumes:
+      - ./:/app  # Mount local dir for scripts
+    networks:
+      - default
+
+volumes:
+  minio-data:
+
+networks:
+  default:
+    driver: bridge
