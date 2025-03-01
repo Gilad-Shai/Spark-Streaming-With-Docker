@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType
 
-spark = SparkSession.builder.master("local[*]").appName("DataGenerator").getOrCreate()
+spark = SparkSession.builder.master("local[*]").appName("ModelCreation").getOrCreate()
 
 schema = StructType([
     StructField("model_id",IntegerType(),False),
