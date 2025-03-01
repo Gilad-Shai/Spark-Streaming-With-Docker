@@ -2,7 +2,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql.types import IntegerType
 
-spark = SparkSession.builder.master("local[*]").appName("DataGenerator").getOrCreate()
+spark = SparkSession.builder.master("local[*]").appName("CarsGenerator").getOrCreate()
 
 car_models = spark.read.parquet("s3a://spark/data/dims/car_models")
 car_colors = spark.read.parquet("s3a://spark/data/dims/car_colors")
